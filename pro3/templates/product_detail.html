@@ -1,0 +1,36 @@
+<!-- templates/product_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} Details</title>
+    <style>
+        img {
+            max-width: 200px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ product.name }}</h1>
+    <p>Description: {{ product.description }}</p>
+    <p>Price: {{ product.price }}</p>
+    <p>Categories:
+        <ul>
+            {% for category in product.categories.all %}
+                <li>{{ category.name }}</li>
+            {% endfor %}
+        </ul>
+    </p>
+    <p>Images:
+        <ul>
+            {% for image in product.images.all %}
+                <li><img src="{{ image.image.url }}" alt="{{ product.name }}"></li>
+            {% endfor %}
+        </ul>
+    </p>
+    <a href="{% url 'index' %}">Back to Product List</a>
+</body>
+</html>

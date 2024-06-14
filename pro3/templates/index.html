@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Upload Form</title>
+    <style>
+         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input[type="file"] {
+            margin-top: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button[type="submit"] {
+            background-color: #28a745;
+            margin-top: 10px;
+        }
+
+        button[type="button"] {
+            background-color: #ffc107;
+            margin-top: 5px;
+        }
+
+        button[type="submit"]:hover,
+        button[type="button"]:hover {
+            opacity: 0.8;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+
+        .product {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .product img {
+            max-width: 100px;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .product-details {
+            display: inline-block;
+            vertical-align: top;
+            width: calc(100% - 120px);
+        }
+
+        .product-details h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .product-details p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .product-details strong {
+            color: #333;
+        }
+
+        .product-actions {
+            margin-top: 10px;
+        }
+
+        .product-actions button {
+            background-color: #dc3545;
+        }
+
+        .product-actions button:hover {
+            background-color: #c82333;
+        }
+
+        .product-actions a {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .product-actions a:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Upload Form</h1>
+
+        <!-- Search and Filter Form -->
+        <form method="get" onsubmit="return validateSearchForm()">
+            <div class="form-section">
+                <input type="text" name="q" placeholder="Search by name" value="{{ query }}">
+            </div>
+            <div class="form-section">
+                <label for="min_price">Min Price:</label>
+                <input type="number" name="min_price" id="min_price" value="{{ min_price }}">
+            </div>
+            <div class="form-section">
+                <label for="max_price">Max Price:</label>
+                <input type="number" name="max_price" id="max_price" value="{{ max_price }}">
+            </div>
+            <div class="form-section">
+                <label for="min_images">Min Images:</label>
+                <input type="number" name="min_images" id="min_images" value="{{ min_images }}">
+            </div>
+            <div class="form-section">
+                <label for="max_images">Max Images:</label>
+                <input type="number" name="max_images" id="max_images" value="{{ max_images }}">
+            </div>
+            <div class="form-section">
+                <label for="categories">Categories:</label>
+                <select name="categories" id="categories" multiple>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id|stringformat:"s" in selected_categories %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Search</button>
+        </form>
+
+        <hr>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-section">
+                <label for="id_name">Name:</label>
+                {{ product_form.name }}
+
+                <label for="id_description">Description:</label>
+                {{ product_form.description }}
+
+                <label for="id_price">Price:</label>
+                {{ product_form.price }}
+            </div>
+
+            <div class="form-section">
+                <label for="id_images">Images:</label>
+                <div id="image_fields">
+                    <input type="file" name="images">
+                </div>
+                <button type="button" onclick="addImageField()">Add Images</button>
+            </div>
+
+            <div class="form-section">
+                <label for="id_categories">Categories:</label>
+                <select name="categories" id="id_categories" multiple>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" name="product_form">Upload Product</button>
+        </form>
+
+        <hr>
+
+        <h2>Add Category</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-section">
+                <label for="id_category_name">Category Name:</label>
+                <input type="text" name="name" id="id_category_name">
+                <button type="submit" name="add_category">Add Category</button>
+            </div>
+        </form>
+
+        <h2>Remove Category</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-section">
+                {% for category in categories %}
+                    <label for="remove_category_{{ category.id }}">{{ category.name }}</label>
+                    <button type="submit" name="remove_category" value="{{ category.id }}">Remove</button>
+                {% endfor %}
+            </div>
+        </form>
+
+        <hr>
+
+        <h2>Products</h2>
+        <ul>
+            {% for product in products %}
+                <li class="product">
+                    <div>
+                        {% for image in product.images.all %}
+                            <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                        {% endfor %}
+                    </div>
+                    <div class="product-details">
+                        <h3>{{ product.name }}</h3>
+                        <p><strong>Description:</strong> {{ product.description|truncatechars:30 }}</p>
+                        <p><strong>Price:</strong> ${{ product.price }}</p>
+                        <p><strong>Categories:</strong>
+                            {% for category in product.categories.all %}
+                                {{ category.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Number of Images:</strong> {{ product.images.count }}</p>
+                        <form method="post" action="{% url 'remove_product' product.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Remove</button>
+                        </form>
+                        <a href="{% url 'product_detail' product.id %}">View Details</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+    <script>
+        function addImageField() {
+            var imagesField = document.getElementById('image_fields');
+            var newInput = document.createElement('input');
+            newInput.type = 'file';
+            newInput.name = 'images';
+            imagesField.appendChild(newInput);
+        }
+
+        function validateSearchForm() {
+            var minPrice = parseFloat(document.getElementById('min_price').value);
+            var maxPrice = parseFloat(document.getElementById('max_price').value);
+            var minImages = parseInt(document.getElementById('min_images').value);
+            var maxImages = parseInt(document.getElementById('max_images').value);
+
+            if (minPrice > maxPrice) {
+                alert("Min price cannot be higher than max price.");
+                return false;
+            }
+
+            if (minImages > maxImages) {
+                alert("Min images cannot be more than max images.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>
